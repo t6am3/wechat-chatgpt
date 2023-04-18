@@ -265,6 +265,7 @@ export class ChatGPTBot {
           return;
         }
       }
+      // im handler
       return;
     }
     if (rawText.startsWith("/cmd ")){
