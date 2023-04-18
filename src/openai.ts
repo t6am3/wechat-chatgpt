@@ -95,4 +95,4 @@ function syncWhisper(username:string,videoPath: string): Promise<string> {
   }
 }
 
-export {chatgpt,dalle,whisper};
+export {chatgpt,dalle,whisper,syncWhisper};
