@@ -2,7 +2,7 @@ import { config } from "./config.js";
 import {ContactImpl, ContactInterface, RoomImpl, RoomInterface} from "wechaty/impls";
 import { Message } from "wechaty";
 import {FileBox} from "file-box";
-import {chatgpt, dalle, whisper} from "./openai.js";
+import {chatgpt, dalle, whisper, syncWhisper} from "./openai.js";
 import DBUtils from "./data.js";
 import { regexpEncode } from "./utils.js";
 enum MessageType {
@@ -252,9 +252,19 @@ export class ChatGPTBot {
         return;
       });
       // Whisper
-      whisper("",fileName).then((text) => {
-        message.say(text);
-      })
+      // whisper("",fileName).then((text) => {
+      //   message.say(text);
+      // })
+      const inputText = syncWhisper("",fileName);
+      if (privateChat) {
+        return await "你：" + inputText + "\nchatgpt:" + this.onPrivateMessage(talker, inputText);
+      } else{
+        if (!this.disableGroupMessage){
+          return await "你：" + inputText + "\nchatgpt:" +this.onGroupMessage(talker, inputText, room);
+        } else {
+          return;
+        }
+      }
       return;
     }
     if (rawText.startsWith("/cmd ")){

@@ -79,4 +79,20 @@ async function whisper(username:string,videoPath: string): Promise<string> {
   }
 }
 
+/**
+ * Speech to text
+ * @param username
+ * @param videoPath
+ */
+function syncWhisper(username:string,videoPath: string): Promise<string> {
+  const file:any= fs.createReadStream(videoPath);
+  const response = await openai.createTranscription(file,"whisper-1")
+    .then((res) => res.data).catch((err) => console.log(err));
+  if (response) {
+    return response.text;
+  }else{
+    return "Speech to text failed"
+  }
+}
+
 export {chatgpt,dalle,whisper};
