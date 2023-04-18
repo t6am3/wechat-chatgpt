@@ -255,7 +255,7 @@ export class ChatGPTBot {
       // whisper("",fileName).then((text) => {
       //   message.say(text);
       // })
-      const inputText = syncWhisper("",fileName);
+      const inputText = await whisper("",fileName);
       if (privateChat) {
         return await "你：" + inputText + "\nchatgpt:" + this.onPrivateMessage(talker, inputText);
       } else{
