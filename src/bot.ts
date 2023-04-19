@@ -129,9 +129,9 @@ export class ChatGPTBot {
     // remove more text via - - - - - - - - - - - - - - -
     return text
   }
-  async getGPTMessage(talkerName: string,text: string): Promise<string> {
+  async getGPTMessage(talkerName: string,text: string, privateChat: boolean=false): Promise<string> {
     let gptMessage = await chatgpt(talkerName,text);
-    if (gptMessage !=="") {
+    if (gptMessage !=="" && privateChat) {
       DBUtils.addAssistantMessage(talkerName,gptMessage);
       return gptMessage;
     }
@@ -223,7 +223,7 @@ export class ChatGPTBot {
   }
 
   async onPrivateMessage(talker: ContactInterface, text: string) {
-    const gptMessage = await this.getGPTMessage(talker.name(),text);
+    const gptMessage = await this.getGPTMessage(talker.name(),text,true);
     await this.trySay(talker, gptMessage);
   }
 
@@ -232,7 +232,7 @@ export class ChatGPTBot {
     text: string,
     room: RoomInterface
   ) {
-    const gptMessage = await this.getGPTMessage(await room.topic(),text);
+    const gptMessage = await this.getGPTMessage(await room.topic(),text,false);
     const result = `@${talker.name()} ${text}\n\n------\n ${gptMessage}`;
     await this.trySay(room, result);
   }
