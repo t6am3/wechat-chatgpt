@@ -19,6 +19,7 @@ class DB {
       console.log(`用户${username}已存在`);
       return existUser;
     }
+    console.log(`创建新用户${username}`);
     const newUser: User = {
       username: username,
       chatMessage: [
