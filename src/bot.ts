@@ -131,8 +131,10 @@ export class ChatGPTBot {
   }
   async getGPTMessage(talkerName: string,text: string, privateChat: boolean=false): Promise<string> {
     let gptMessage = await chatgpt(talkerName,text);
-    if (gptMessage !=="" && privateChat) {
-      DBUtils.addAssistantMessage(talkerName,gptMessage);
+    if (gptMessage !=="") {
+      if (privateChat) {
+         DBUtils.addAssistantMessage(talkerName,gptMessage);
+      }
       return gptMessage;
     }
     return "Sorry, please try again later. 😔";
