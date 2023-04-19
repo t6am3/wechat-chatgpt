@@ -176,8 +176,9 @@ export class ChatGPTBot {
     const { chatTriggerRule } = this;
     let triggered = false;
     if (privateChat) {
-      const regEx = this.chatPrivateTriggerRule
-      triggered = regEx? regEx.test(text): true;
+      // const regEx = this.chatPrivateTriggerRule
+      // triggered = regEx? regEx.test(text): true;
+      triggered = true;
     } else {
       triggered = this.chatGroupTriggerRegEx.test(text);
       // group message support `chatTriggerRule`
