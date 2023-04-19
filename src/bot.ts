@@ -130,6 +130,10 @@ export class ChatGPTBot {
     return text
   }
   async getGPTMessage(talkerName: string,text: string, privateChat: boolean=false): Promise<string> {
+    if (privateChat) {
+      // 先将用户输入的消息添加到数据库中
+      DBUtils.addUserMessage(talkerName, text);
+    }
     let gptMessage = await chatgpt(talkerName,text);
     if (gptMessage !=="") {
       if (privateChat) {
@@ -244,7 +248,7 @@ export class ChatGPTBot {
     const room = message.room();
     const messageType = message.type();
     const privateChat = !room;
-    const isVip = this.checkVipName(talker.name());
+    const isVip = privateChat;
     if (isVip) {
       return await this.onVipMessage(message);
     } else {
@@ -313,10 +317,10 @@ export class ChatGPTBot {
       // })
       const inputText = await whisper("",fileName);
       if (privateChat) {
-        return await "你：" + inputText + "\nchatgpt:" + this.onPrivateMessage(talker, inputText);
+        return await this.onPrivateMessage(talker, inputText);
       } else{
         if (!this.disableGroupMessage){
-          return await "你：" + inputText + "\nchatgpt:" +this.onGroupMessage(talker, inputText, room);
+          return await this.onGroupMessage(talker, inputText, room);
         } else {
           return;
         }
