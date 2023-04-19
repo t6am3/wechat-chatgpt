@@ -144,6 +144,13 @@ export class ChatGPTBot {
     }
     return config.chatgptBlockWords.some((word) => message.includes(word));
   }
+  // Check if the name is in vip name list
+  checkVipName(name: string): boolean {
+    if (config.vipNameList.length == 0) {
+      return false;
+    }
+    return config.vipNameList.some((vipName) => name.includes(vipName));
+  }
   // The message is segmented according to its size
   async trySay(
     talker: RoomInterface | ContactInterface,
@@ -229,6 +236,52 @@ export class ChatGPTBot {
     await this.trySay(room, result);
   }
   async onMessage(message: Message) {
+    const talker = message.talker();
+    const rawText = message.text();
+    const room = message.room();
+    const messageType = message.type();
+    const privateChat = !room;
+    const isVip = this.checkVipName(talker.name());
+    if (isVip) {
+      return await this.onVipMessage(message);
+    } else {
+      return await this.onNormalMessage(message);
+    }
+  }
+
+  async onNormalMessage(message: Message) {
+    const talker = message.talker();
+    const rawText = message.text();
+    const room = message.room();
+    const messageType = message.type();
+    const privateChat = !room;
+    if (privateChat) {
+      console.log(`🤵 Contact: ${talker.name()} 💬 Text: ${rawText}`)
+    } else {
+      const topic = await room.topic()
+      console.log(`🚪 Room: ${topic} 🤵 Contact: ${talker.name()} 💬 Text: ${rawText}`)
+    }
+    if (this.isNonsense(talker, messageType, rawText)) {
+      return;
+    }
+
+    if (this.triggerGPTMessage(rawText, privateChat)) {
+      const text = this.cleanMessage(rawText, privateChat);
+      if (privateChat) {
+        return await this.onPrivateMessage(talker, text);
+      } else{
+        if (!this.disableGroupMessage){
+          return await this.onGroupMessage(talker, text, room);
+        } else {
+          return;
+        }
+      }
+    } else {
+      return;
+    }
+  }
+
+  async onVipMessage(message: Message) {
     const talker = message.talker();
     const rawText = message.text();
     const room = message.room();
