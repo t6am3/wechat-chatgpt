@@ -20,6 +20,8 @@ const openai = new OpenAIApi(configuration);
  * @param message
  */
 async function chatgpt(username:string,message: string): Promise<string> {
+  // 先将用户输入的消息添加到数据库中
+  DBUtils.addUserMessage(username, message);
   const messages = DBUtils.getChatMessage(username);
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",

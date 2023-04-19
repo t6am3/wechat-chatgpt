@@ -130,14 +130,12 @@ export class ChatGPTBot {
     return text
   }
   async getGPTMessage(talkerName: string,text: string, privateChat: boolean=false): Promise<string> {
-    if (privateChat) {
-      // 先将用户输入的消息添加到数据库中
-      DBUtils.addUserMessage(talkerName, text);
-    }
     let gptMessage = await chatgpt(talkerName,text);
     if (gptMessage !=="") {
       if (privateChat) {
          DBUtils.addAssistantMessage(talkerName,gptMessage);
+      } else {
+        DBUtils.clearHistory(talkerName);
       }
       return gptMessage;
     }
